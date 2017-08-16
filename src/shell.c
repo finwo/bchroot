@@ -129,6 +129,8 @@ static int run(char* cmd, int input, int first, int last)
 	if (args[0] != NULL) {
 		if (strcmp(args[0], "exit") == 0) 
 			exit(0);
+		if (strcmp(args[0], "cd") == 0)
+		    return chdir(args[1]);
 		n += 1;
 		return command(input, first, last);
 	}
