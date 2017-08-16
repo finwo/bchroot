@@ -1,4 +1,6 @@
-/* Compile with: g++ -Wall âWerror -o shell shell.c */
+// Compile with: g++ -Wall -Werror -o shell shell.c
+// Origin: https://gist.github.com/parse/966049
+
 
 #include <stdio.h>
 #include <stdlib.h>
