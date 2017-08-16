@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 int error( char *str ) {
@@ -50,7 +51,7 @@ int main( int argc, char **argv ) {
       execvp( cmd, args );
       return 3;
     }
-    wait();
+    wait(NULL);
   }
 
   return 0;

@@ -1,7 +1,8 @@
-#include <dirent.h> // DIR, opendir, readdir, closedir
-#include <stdlib.h> // execlp
-#include <string.h> // strlen, strcat
-#include <unistd.h> // calloc
+#include <dirent.h>   // DIR, opendir, readdir, closedir
+#include <stdlib.h>   // execlp
+#include <string.h>   // strlen, strcat
+#include <sys/wait.h> // wait
+#include <unistd.h>   // calloc
 
 #define SDIR "/etc/sv"
 
