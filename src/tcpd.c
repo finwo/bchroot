@@ -44,6 +44,7 @@ int main( int argc, char **argv ) {
   while( (nsock=accept(sockfd,(struct sockaddr *) &caddr,&clen)) >= 0 ) {
     if(fork()) {
       close(nsock);
+      waitpid(-1,NULL,WNOHANG);
     } else {
       dup2(nsock,0);
       dup2(nsock,1);
@@ -51,7 +52,6 @@ int main( int argc, char **argv ) {
       execvp( cmd, args );
       return 3;
     }
-    wait(NULL);
   }
 
   return 0;
