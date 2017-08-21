@@ -19,3 +19,4 @@ all:
 	ldd rootfs/bin/tcpd  | grep "/" | sed 's/^[^/]*//' | awk '{print $$1}' | xargs -I '{}' ./cp rootfs '{}'
 	mkdir -p rootfs/etc/sv
 	ln -s /bin/httpd rootfs/etc/sv/httpd
+	ln -s /bin/sh    rootfs/etc/sv/sh
