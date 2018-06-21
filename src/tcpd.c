@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,16 +20,16 @@ int main( int argc, char **argv ) {
   int i, port = 8080;
   char *cmd = 0;
   char **args = 0;
-  for(i=0;i<4&&i<argc;i++) {
+  for(i=0;i<3&&i<argc;i++) {
     switch(i) {
       case 0: break;
       case 1: port = atoi(*(argv+i)); break;
-      case 2: cmd=*(argv+i); break;
-      case 3: args=argv+i; break;
+      case 2: cmd=*(argv+i); args=argv+i; break;
     }
   }
 
   int sockfd = socket( AF_INET, SOCK_STREAM, 0 );
+  int on     = 1;
   if(sockfd<0) error("socket");
   struct sockaddr_in saddr, caddr;
   bzero((char *) &saddr, sizeof(saddr));
@@ -33,6 +37,7 @@ int main( int argc, char **argv ) {
   saddr.sin_addr.s_addr = INADDR_ANY;
   saddr.sin_port        = htons(port);
 
+  setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
   if(bind(sockfd,(struct sockaddr *) &saddr, sizeof(saddr)) < 0) {
     error("bind");
   }
@@ -56,3 +61,7 @@ int main( int argc, char **argv ) {
 
   return 0;
 }
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
