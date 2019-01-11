@@ -1,5 +1,6 @@
 CC=$(shell which tcc gcc | head -1)
 
+.PHONY: all
 all:
 	rm -rf rootfs
 	mkdir -p rootfs/bin
@@ -22,3 +23,7 @@ all:
 	mkdir -p rootfs/etc/sv
 	ln -s /bin/httpd rootfs/etc/sv/httpd
 	ln -s /bin/sh    rootfs/etc/sv/sh
+
+.PHONY: enter
+enter:
+	chroot rootfs /bin/sh
