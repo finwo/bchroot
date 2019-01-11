@@ -13,6 +13,9 @@
 #include <sysexits.h>
 #include <time.h>
 #include <unistd.h>
+#include <linux/limits.h>
+
+#define CAN_BUF_SIZE 2048
 
 static char* global_dir = ".";
 
@@ -103,7 +106,7 @@ static void print_filetype(mode_t mode)
 
 void readable_fs(double size, char* buf)
 {
-    const char* units[] = { "", "K", "M", "G", "T" };
+    const char* units[] = { "", "K", "M", "G", "T", "P", "E", "Z", "Y" };
     int i = 0;
 
     while (size > 1024)
@@ -136,18 +139,21 @@ void print_time(time_t mod_time)
                            : "%b %e  %Y";
 
     char time_buf[128];
-    strftime(time_buf, sizeof(time_buf), format, t);
+    if (0 == strftime(time_buf, sizeof time_buf, format, t)) {
+      time_buf[0] = 0;
+      abort();
+    }
     printf("%s", time_buf);
 }
 
 struct stat get_stats(const char* filename)
 {
-    char path[1024];
+    char path[PATH_MAX + 1 + NAME_MAX + 1];
     sprintf(path, "%s/%s", global_dir, filename);
     struct stat sb;
 
     if (lstat(path, &sb) < 0)
-    {   
+    {
         perror(path);
         exit(EX_IOERR);
     }
@@ -258,7 +264,7 @@ void display_stats(char* dir, char* filename, struct Options opts)
 
     if (opts.using_i)
     {
-        printf("%ld ", (long)sb.st_ino);
+      printf("%ju ", (uintmax_t) sb.st_ino);
     }
 
     print_filetype(sb.st_mode);
@@ -289,7 +295,7 @@ bool can_recurse_dir(const char* parent, char* curr)
         return false;
     }
 
-    char path[2048];
+    char path[CAN_BUF_SIZE];
     sprintf(path, "%s/%s", parent, curr);
     struct stat sb;
 
@@ -366,11 +372,11 @@ static int cmp_size(const void* p1, const void* p2)
     return size1 < size2;
 }
 
-void display_dir(char* dir, struct Options opts)
+void display_dir( const char* dir, struct Options opts)
 {
     DIR* dfd = opendir(dir);
     struct dirent* dp = readdir(dfd);
-    long curr_alloc_amt = 30000;
+    size_t curr_alloc_amt = 30000;
     char** dir_arr = malloc(curr_alloc_amt * sizeof(char*));
 
     if (!dir_arr)
@@ -389,7 +395,7 @@ void display_dir(char* dir, struct Options opts)
             if (count >= curr_alloc_amt)
             {
                 curr_alloc_amt *= 2;
-                dir_arr = realloc(dir_arr, curr_alloc_amt * sizeof(char*));
+                dir_arr         = realloc(dir_arr, sizeof *dir_arr * curr_alloc_amt);
 
                 if (!dir_arr)
                 {
